@@ -29,14 +29,17 @@ public:
 
     int* getDimensions() const;
     double& at(const int& coords);
+    void fill(const type value);
     void toFile(const std::string& filepath) const;
+
+    int getSize() const;
 private:
     int size;
-    const int* DIM; // first value is length
+    const int* DIM; // first value is dimension, others are lengths
     type* data;
 
-    int calcLocation(const int& coords);
-    bool equalSizeCheck(const int size1, const int size2);
+    int calcLocation(const int* coords) const;
+    void equalSizeCheck(const int size1, const int size2);
 };
 
 #include "matrix2.tpp"

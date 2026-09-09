@@ -50,9 +50,17 @@ int main() {
     // Matrix2 testing
     int* dimensions1 = new int[3];
     dimensions1[0] = 2;
-    dimensions1[1] = 20;
-    dimensions1[2] = 30;
-    Matrix<double> matrix1(dimensions1&);
-    Matrix.toFile("/output/matrix1.dat");
+    dimensions1[1] = 2;
+    dimensions1[2] = 3;
+    Matrix<double> matrix1(dimensions1);
+    matrix1.fill(2.2);
+    int size = matrix1.getSize();
+    std::cout << "Size: " << size << "\n";
+    Matrix<double> matrix2(dimensions1);
+    matrix2.fill(3.1);
+    matrix2+=1.1;
+    Matrix<double> matrix3 = matrix1 + matrix2;
+    matrix1.toFile("output/matrix1.dat");
+    matrix3.toFile("output/matrix3.dat");
 
 }
