@@ -1,0 +1,6 @@
+Number of Side Nodes = [200]
+Number of Itterations = [1000]
+Initial Density = [2]
+Reynolds Number = [5000]
+Relaxation Time = [0.8]
+Maximum Error = [0.000001]
