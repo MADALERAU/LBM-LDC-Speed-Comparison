@@ -27,15 +27,23 @@ public:
     Matrix operator*(const Matrix& rhs) const;
     Matrix operator/(const Matrix& rhs) const;
 
-    int* getDimensions() const;
-    double& at(const int& coords);
+    // The following two methods are vibe coded, will adjust later
+    Matrix<type> Matrix<type>::multiply(const Matrix<type>& rhs) const;
+    Matrix<type> Matrix<type>::multiplyPages(const Matrix<type>& rhs) const;
+
+    // Also vibe coded, will fix later
+    Matrix<type> Matrix<type>::sumOverDim(int dim);
+
+    const int* getDimensions() const;
+    type& Matrix<type>::at(const int location);
+    type& Matrix<type>::at(const int* coords);
     void fill(const type value);
     void toFile(const std::string& filepath) const;
 
     int getSize() const;
 private:
     int size;
-    const int* DIM; // first value is dimension, others are lengths
+    int* DIM; // first value is dimension, others are lengths
     type* data;
 
     int calcLocation(const int* coords) const;
