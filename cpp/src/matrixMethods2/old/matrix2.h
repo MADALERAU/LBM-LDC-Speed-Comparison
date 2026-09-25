@@ -28,24 +28,15 @@ public:
     Matrix operator/(const Matrix& rhs) const;
 
     // The following two methods are vibe coded, will adjust later
-    Matrix<type> multiply(const Matrix<type>& rhs) const;
-    Matrix<type> multiplyPages(const Matrix<type>& rhs) const;
+    Matrix<type> Matrix<type>::multiply(const Matrix<type>& rhs) const;
+    Matrix<type> Matrix<type>::multiplyPages(const Matrix<type>& rhs) const;
 
     // Also vibe coded, will fix later
-    Matrix<type> sumOverDim(int dim);
+    Matrix<type> Matrix<type>::sumOverDim(int dim);
 
     const int* getDimensions() const;
-    type& at(const int location);
-    const type& at(const int location) const;
-    type& at(const int* coords);
-    const type& at(const int* coords) const;
-
-    // Raw contiguous data access. Bypasses calcLocation()'s per-element
-    // overhead, needed for tight numerical kernels (e.g. eqmD2Q9) that
-    // walk an entire page/field at a time.
-    type* getData();
-    const type* getData() const;
-
+    type& Matrix<type>::at(const int location);
+    type& Matrix<type>::at(const int* coords);
     void fill(const type value);
     void toFile(const std::string& filepath) const;
     int calcLocation(const int* coords) const;

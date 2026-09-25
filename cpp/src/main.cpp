@@ -1,9 +1,13 @@
 #include "inputHandler.h"
 #include "matrixMethods2/matrix2.h"
+#include "matrixMethods2/eqmD2Q9.tpp"
+#include "stream.h"
 
 #include <string>
 #include <iostream>
 #include <cmath>
+
+void populateZoneId(Matrix<int>& zoneId);
 
 int main () {
 
@@ -36,7 +40,7 @@ int main () {
     // general stuff
     double cs = 1.0/sqrt(3);
     double vis = (tau - 0.5)*cs*cs;
-    double u_lid = reynoldsNumber*vis/numX;
+    double uLid = reynoldsNumber*vis/numX;
 
     // ksi
     const int KSI_DIM[] = {2, 9, 2};
@@ -71,15 +75,92 @@ int main () {
     u.fill(0.0);
 
     //f
+    //const int F_DIM[] = {3, numY, numX, 9};
+    //Matrix<double> f(F_DIM);
+    //f.fill(0.0);
+    Matrix<double> f = eqmD2Q9(rho, ksi, u, w);
 
     //feq
+    //Matrix<double> fEq = eqmD2Q9(rho, ksi, u, w);
+    Matrix<double> fEq = f;
     //fnew
+    // Matrix<double> fNew(F_DIM);
+    // fNew.fill(0.0);
+    Matrix<double> fNew = f;
+
+    //zone map
+    Matrix<int> zoneId(RHO_DIM);
+    populateZoneId(zoneId);
+
 
     // TESTIN
-    ksi.toFile("output/ksi.dat");
-    w.toFile("output/w.dat");
-    rho.toFile("output/rho.dat");
-    u.toFile("output/u.dat");
+    ksi.toFile("output/initials/ksi.dat");
+    w.toFile("output/initials/w.dat");
+    rho.toFile("output/initials/rho.dat");
+    u.toFile("output/initials/u.dat");
+    f.toFile("output/initials/f.dat");
+    fEq.toFile("output/initials/fEq.dat");
+    fNew.toFile("output/initials/fNew.dat");
+    zoneId.toFile("output/initials/zoneId.dat");
+
+    for( int j = 0; j < numY; ++j) {
+        for (int i = 0; i < numX; ++i) {
+            int* coords = new int[3];
+            coords[0] = i;
+            coords[1] = j;
+
+            double value;
+            if (j == 0) {
+                if (i == 0) {
+                    value = 1.0;
+                }
+                else if (i == numX - 1) {
+                    value = 2.0;
+                }
+                else {
+                    value = 3.0;
+                }
+            }
+            else if(j == numY - 1) {
+                if (i == 0) {
+                    value = 4.0;
+                }
+                else if (i == numX - 1) {
+                    value = 5.0;
+                }
+                else {
+                    value = 6.0;
+                }
+            }
+            else if (i == 0) {
+                value = 7.0;
+            }
+            else if (i == numX - 1) {
+                value = 8.0;
+            }
+            else {
+                value = 0.0;
+            }
+
+            coords[2] = 0; f.at(coords) = value;
+            coords[2] = 1; f.at(coords) = value;
+            coords[2] = 2; f.at(coords) = value;
+            coords[2] = 3; f.at(coords) = value;
+            coords[2] = 4; f.at(coords) = value;
+            coords[2] = 5; f.at(coords) = value;
+            coords[2] = 6; f.at(coords) = value;
+            coords[2] = 7; f.at(coords) = value;
+            coords[2] = 8; f.at(coords) = value;
+
+            delete[] coords;
+        }
+    }
+    f.toFile("output/0.dat");
+
+    fNew.fill(-1.0);
+    stream(fNew, f, rho, uLid, zoneId);
+    std::cout << "this code ran\n";
+    fNew.toFile("output/1.dat");
 
     return 0;
 
@@ -89,11 +170,14 @@ int main () {
         if (10 % itt) { std::cout << " | Itt: " << itt << "\n"; }
 
         // Streaming
+        stream(fNew, f, rho, uLid, zoneId);
 
         // Collision
 
         // BGK + Update
 
+        fNew.toFile("output/"+std::to_string(itt)+".dat");
+        f = fNew;
     }
     // Output Results
 
@@ -101,27 +185,37 @@ int main () {
     return 0;
 }
 
-/*
-void eqmD2Q9(Matrix<double>& fEq, const Matrix<double>& rho, const Matrix<double>& ksi, const Matrix<double>& u, const Matrix<double>& w, double cs) {
-    Matrix<double> middle(fEq.getDimensions());
-    Matrix<double> end(fEq.getDimensions());
+void populateZoneId(Matrix<int>& zoneId) {
+    const int* ZONE_DIM = zoneId.getDimensions();
+    int numY = ZONE_DIM[1];
+    int numX = ZONE_DIM[2];
 
-    fEq = rho;
+    int* coords = new int[2];
+    int value;
 
-    middle = ksi.multiplyPages(u);
-    middle /= cs*cs;
-    middle += 1;
-    Matrix<double> middle2 = middle * middle;
-    middle2 /= 2*cs*cs*cs*cs;
-    middle += middle2;
+    for (int j = 0; j < numY; ++j) {
+        for (int i = 0; i < numX; ++i) {
+            value = 0;
 
-    Matrix<double> end = u;
-    end*= u;
-    end.sumOverDim(3);
+            if (j == 0) { // bottom of domain
+                if (i == 0)             { value = 7; } // bottom-left corner
+                else if (i == numX - 1) { value = 8; } // bottom-right corner
+                else                    { value = 4; } // bottom side
+            }
+            else if (j == numY - 1) { // top of domain
+                if (i == 0)             { value = 6; } // top-left corner
+                else if (i == numX - 1) { value = 5; } // top-right corner
+                else                    { value = 2; } // top side
+            }
+            else if (i == 0)            { value = 3; } // right side
+            else if (i == numX - 1)     { value = 1; } // left side
 
-    fEq *= middle;
+            coords[0] = i;
+            coords[1] = j;
+            zoneId.at(coords) = value;
+        }
+    }
 
-
-    delete[] middle;
-    delete[] middle2;
-}*/
+    delete[] ZONE_DIM;
+    delete[] coords;
+}

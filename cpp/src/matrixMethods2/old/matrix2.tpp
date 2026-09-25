@@ -415,26 +415,9 @@ type& Matrix<type>::at(const int location) {
     return this->data[location];
 }
 template <class type>
-const type& Matrix<type>::at(const int location) const {
-    return this->data[location];
-}
-template <class type>
 type& Matrix<type>::at(const int* coords) {
     int location = calcLocation(coords);
     return this->data[location];
-}
-template <class type>
-const type& Matrix<type>::at(const int* coords) const {
-    int location = calcLocation(coords);
-    return this->data[location];
-}
-template <class type>
-type* Matrix<type>::getData() {
-    return data;
-}
-template <class type>
-const type* Matrix<type>::getData() const {
-    return data;
 }
 template <class type>
 void Matrix<type>::fill(const type value) {
@@ -471,7 +454,6 @@ void Matrix<type>::toFile(const std::string& filepath) const {
         for (int k = 0; k < DIM[3]; ++k) {
             for (int j = 0; j < DIM[1]; ++j) {
                 for (int i = 0; i < DIM[2]; ++i) {
-                    coords[2] = k;
                     coords[1] = j;
                     coords[0] = i;
                     out  << std::setprecision(15) << this->data[calcLocation(coords)];
@@ -515,10 +497,7 @@ int Matrix<type>::calcLocation(const int* coords) const {
     }
 
     if (DIM[0] == 3) {
-        // Page-major (SoA) layout: page coords[2] is the slowest-varying
-        // index, so each page is a contiguous DIM[1]*DIM[2] block - this
-        // matches the indexing multiplyPages() already assumes.
-        return DIM[1] * DIM[2] * coords[2]
+        return DIM[2] * DIM[3] * coords[2]
         + DIM[2] * coords[1]
         + coords[0];
     }
