@@ -8,7 +8,7 @@ void stream(
     Matrix<type>& fNew,
     const Matrix<type>& f,
     const Matrix<type>& rho,
-    const double uLid,
+    const type uLid,
     const Matrix<int>& zoneId
 );
 

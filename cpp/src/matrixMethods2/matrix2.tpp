@@ -459,8 +459,9 @@ void Matrix<type>::toFile(const std::string& filepath) const {
                 coords[1] = j;
                 coords[0] = i;
                 out  << std::setprecision(15) << this->data[calcLocation(coords)];
-                if (i < DIM[2] - 1)
+                if (i < DIM[2] - 1) {
                     out << " ";
+                }
             }
             out << "\n";
         }
@@ -475,8 +476,9 @@ void Matrix<type>::toFile(const std::string& filepath) const {
                     coords[1] = j;
                     coords[0] = i;
                     out  << std::setprecision(15) << this->data[calcLocation(coords)];
-                    if (i < DIM[2] - 1)
+                    if (i < DIM[2] - 1) {
                         out << " ";
+                    }
                 }
                 out << "\n";
             }
@@ -492,6 +494,19 @@ void Matrix<type>::toFile(const std::string& filepath) const {
     delete[] coords;
 
     out.close();
+}
+
+template <class type>
+std::string Matrix<type>::toString() const {
+    std::string out = "MATRIX\n";
+    out += "   | Size: " + std::to_string(size) + "\n";
+    out += "   | Dim: ";
+    for (int i = 1; i <= DIM[0]; ++i) {
+        out += std::to_string(DIM[i]) + " ";
+    }
+    out += "\n";
+
+    return out;
 }
 
 template <class type>

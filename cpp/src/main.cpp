@@ -103,71 +103,13 @@ int main () {
     fNew.toFile("output/initials/fNew.dat");
     zoneId.toFile("output/initials/zoneId.dat");
 
-    for( int j = 0; j < numY; ++j) {
-        for (int i = 0; i < numX; ++i) {
-            int* coords = new int[3];
-            coords[0] = i;
-            coords[1] = j;
-
-            double value;
-            if (j == 0) {
-                if (i == 0) {
-                    value = 1.0;
-                }
-                else if (i == numX - 1) {
-                    value = 2.0;
-                }
-                else {
-                    value = 3.0;
-                }
-            }
-            else if(j == numY - 1) {
-                if (i == 0) {
-                    value = 4.0;
-                }
-                else if (i == numX - 1) {
-                    value = 5.0;
-                }
-                else {
-                    value = 6.0;
-                }
-            }
-            else if (i == 0) {
-                value = 7.0;
-            }
-            else if (i == numX - 1) {
-                value = 8.0;
-            }
-            else {
-                value = 0.0;
-            }
-
-            coords[2] = 0; f.at(coords) = value;
-            coords[2] = 1; f.at(coords) = value;
-            coords[2] = 2; f.at(coords) = value;
-            coords[2] = 3; f.at(coords) = value;
-            coords[2] = 4; f.at(coords) = value;
-            coords[2] = 5; f.at(coords) = value;
-            coords[2] = 6; f.at(coords) = value;
-            coords[2] = 7; f.at(coords) = value;
-            coords[2] = 8; f.at(coords) = value;
-
-            delete[] coords;
-        }
-    }
     f.toFile("output/0.dat");
-
-    fNew.fill(-1.0);
-    stream(fNew, f, rho, uLid, zoneId);
-    std::cout << "this code ran\n";
-    fNew.toFile("output/1.dat");
-
-    return 0;
 
     // Main Loop
     std::cout << "MAIN LOOP --------\n";
-    for (int itt = 1; itt <= maxItt; ++itt) {
-        if (10 % itt) { std::cout << " | Itt: " << itt << "\n"; }
+    for (int itt = 1; itt <= 3; ++itt) {
+        if (itt % 1) { std::cout << " | Itt: " << itt << "\n"; }
+        std::cout << "this code ran0\n";
 
         // Streaming
         stream(fNew, f, rho, uLid, zoneId);
@@ -175,12 +117,15 @@ int main () {
         // Collision
 
         // BGK + Update
-
-        fNew.toFile("output/"+std::to_string(itt)+".dat");
+        std::cout << "this code ran1\n";
         f = fNew;
+        //std::swap(f, fNew);
+        std::cout << "this code ran2\n";
+        f.toFile("output/"+std::to_string(itt)+".dat");
+        std::cout << "this code ran3\n";
+        std::cout << f.toString();
     }
     // Output Results
-
 
     return 0;
 }

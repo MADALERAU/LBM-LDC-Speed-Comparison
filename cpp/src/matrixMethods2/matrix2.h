@@ -48,6 +48,7 @@ public:
 
     void fill(const type value);
     void toFile(const std::string& filepath) const;
+    std::string toString() const;
     int calcLocation(const int* coords) const;
 
     int getSize() const;
