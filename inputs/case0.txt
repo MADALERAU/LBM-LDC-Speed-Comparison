@@ -1,5 +1,5 @@
-Number of Side Nodes = [100]
-Number of Itterations = [10000]
+Number of Side Nodes = [250]
+Number of Itterations = [5000]
 Initial Density = [2]
 Reynolds Number = [100]
 Relaxation Time = [0.8]

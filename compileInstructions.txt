@@ -1,9 +1,12 @@
 CPP:
 cl /c src/main.cpp /Fo:bin/main.obj /EHsc /Zi /Fd:debug/vc140.pdb
 cl /c src/inputHandler.cpp /Fo:bin/inputHandler.obj /EHsc /Zi /Fd:debug/vc140.pdb
+cl /c src/stream.tpp /Fo:bin/stream.obj /EHsc /Zi /Fd:debug/vc140.pdb
 ////cl /c src/matrixMethods/*.tpp /Fo:bin/ /EHsc /Zi /Fd:debug/vc140.pdb
 
 link bin/*.obj /OUT:case0.exe /DEBUG /PDB:debug/linkDebug.pdb /ILK:bin/linker.ilk
+
+link bin/*.obj /OUT:test2.exe /DEBUG /PDB:debug/linkDebug.pdb /ILK:bin/linker.ilk
 
 
 TEST:

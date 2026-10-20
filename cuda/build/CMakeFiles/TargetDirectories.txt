@@ -1,0 +1,3 @@
+C:/Users/shepa/OneDrive/Desktop/!MADAL/SpeedComparison/cuda/build/CMakeFiles/lbm_cuda.dir
+C:/Users/shepa/OneDrive/Desktop/!MADAL/SpeedComparison/cuda/build/CMakeFiles/ALL_BUILD.dir
+C:/Users/shepa/OneDrive/Desktop/!MADAL/SpeedComparison/cuda/build/CMakeFiles/ZERO_CHECK.dir

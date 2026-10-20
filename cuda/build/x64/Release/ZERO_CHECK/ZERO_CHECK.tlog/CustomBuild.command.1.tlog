@@ -1,0 +1,10 @@
+^C:\USERS\SHEPA\ONEDRIVE\DESKTOP\!MADAL\SPEEDCOMPARISON\CUDA\BUILD\CMAKEFILES\CE244DC9EE6FE02346712EBF93F62D11\GENERATE.STAMP.RULE
+setlocal
+"C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -SC:/Users/shepa/OneDrive/Desktop/!MADAL/SpeedComparison/cuda -BC:/Users/shepa/OneDrive/Desktop/!MADAL/SpeedComparison/cuda/build --check-stamp-list CMakeFiles/generate.stamp.list --vs-solution-file C:/Users/shepa/OneDrive/Desktop/!MADAL/SpeedComparison/cuda/build/LbmLdcCuda.sln
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd

@@ -27,12 +27,18 @@ public:
     Matrix operator*(const Matrix& rhs) const;
     Matrix operator/(const Matrix& rhs) const;
 
-    // The following two methods are vibe coded, will adjust later
+    Matrix<type> generateTranspose() const;
+
+    // The following three methods are vibe coded, will adjust later
     Matrix<type> multiply(const Matrix<type>& rhs) const;
     Matrix<type> multiplyPages(const Matrix<type>& rhs) const;
+    void multiplyPages(const Matrix<type>& lhs, const Matrix<type>& rhs);
+
+    Matrix<type>& multiplyPages3D(const Matrix<type>& lhs, const Matrix<type>& rhs);
 
     // Also vibe coded, will fix later
     Matrix<type> sumOverDim(int dim);
+    void sumOverDimIntoMat(const Matrix<type>& src, int dimToSumOver);
 
     const int* getDimensions() const;
     type& at(const int location);

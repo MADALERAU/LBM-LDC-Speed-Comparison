@@ -95,7 +95,7 @@ void stream(Matrix<type>& fNew, const Matrix<type>& f, const Matrix<type>& rho, 
                     fNew.at(c7) = f.at(c7 + numX + 1); // 7
                     fNew.at(c8) = f.at(c8 + numX - 1); // 8
 
-                    rhoC = (fNew.at(c3) - fNew.at(c1))/2.0;
+                    avg = (fNew.at(c3) - fNew.at(c1))/2.0;
                     fNew.at(c2) = fNew.at(c4);       // 2
                     fNew.at(c5) = fNew.at(c7) + avg; // 5
                     fNew.at(c6) = fNew.at(c8) - avg; // 6
@@ -162,6 +162,4 @@ void stream(Matrix<type>& fNew, const Matrix<type>& f, const Matrix<type>& rho, 
             }
         }
     }
-
-    //delete[] fDim; // might cause problems if not copy of pointer
 }

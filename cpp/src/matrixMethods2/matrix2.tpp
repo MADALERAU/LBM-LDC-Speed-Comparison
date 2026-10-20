@@ -132,6 +132,28 @@ Matrix<type>& Matrix<type>::operator*=(const type rhs) {
 }
 template <class type>
 Matrix<type>& Matrix<type>::operator/=(const Matrix<type>& rhs) {
+    const int* rhsDim = rhs.getDimensions();
+    if (DIM[1] == rhsDim[1] && DIM[2] == rhsDim[2] && rhsDim[0] == 2 && DIM[0] == 3) {
+        int idx;
+        int coords[2];
+        int size2D = DIM[1]*DIM[2];
+
+        for (int j = 0; j < DIM[2]; ++j) {
+            for (int i = 0; i < DIM[1]; ++i) {
+                coords[0] = i;
+                coords[1] = j;
+                idx = j*DIM[2]+i;
+
+                for (int k = 0; k < DIM[3]; ++k) {
+                    this->data[idx + k*size2D] /= rhs.data[idx];
+                }
+            }
+        }
+
+        return *this;
+
+    }
+
     equalSizeCheck(size, rhs.size);
     for (int i = 0; i < size; ++i) {
         this->data[i] /= rhs.data[i];
@@ -161,20 +183,40 @@ Matrix<type> Matrix<type>::operator+(const Matrix<type>& rhs) const {
 template <class type>
 Matrix<type> Matrix<type>::operator-(const Matrix<type>& rhs) const {
     Matrix<type> output(*this);
-    output += rhs;
+    output -= rhs;
     return output;
 }
 template <class type>
 Matrix<type> Matrix<type>::operator*(const Matrix<type>& rhs) const {
     Matrix<type> output(*this);
-    output += rhs;
+    output *= rhs;
     return output;
 }
 template <class type>
 Matrix<type> Matrix<type>::operator/(const Matrix<type>& rhs) const {
     Matrix<type> output(*this);
-    output += rhs;
+    output /= rhs;
     return output;
+}
+
+template <class type>
+Matrix<type> Matrix<type>::generateTranspose() const {
+
+    if (DIM[0] != 2) {
+        throw std::invalid_argument("Transpose only accepts 2D matricies");
+    }
+
+    const int DIM_T[] = {2, DIM[2], DIM[1]};
+    Matrix<type> transpose(DIM_T);
+
+    for (int j = 0; j < DIM[1]; ++j) {
+        for (int i = 0; i < DIM[2]; ++i) {
+            transpose.data[i * DIM[1] + j] =
+            this->data[j * DIM[2] + i];
+        }
+    }
+
+    return transpose;
 }
 
 // The following two methods are vibe coded matrix multiplication, I will take a closer look at later
@@ -317,6 +359,119 @@ Matrix<type> Matrix<type>::multiplyPages(const Matrix<type>& rhs) const
     return output;
 }
 
+template <class type>
+void Matrix<type>::multiplyPages(
+    const Matrix<type>& lhs,
+    const Matrix<type>& rhs)
+{
+    // LHS must be 3D
+    if (lhs.DIM[0] != 3) {
+        throw std::invalid_argument(
+            "Left-hand matrix must be 3D for multiplyPages()"
+        );
+    }
+
+    // RHS must be 2D
+    if (rhs.DIM[0] != 2) {
+        throw std::invalid_argument(
+            "Right-hand matrix must be 2D for multiplyPages()"
+        );
+    }
+
+    // LHS = rowsA × inner × pages
+    const int rowsA = lhs.DIM[1];
+    const int inner = lhs.DIM[2];
+    const int pages = lhs.DIM[3];
+
+    // RHS = inner × colsB
+    const int rowsB = rhs.DIM[2];
+    const int colsB = rhs.DIM[1];
+
+    // Check multiplication compatibility
+    if (inner != rowsB) {
+        throw std::invalid_argument(
+            "Incompatible matrix dimensions for page multiplication"
+        );
+    }
+
+    // Validate output dimensions
+    if (DIM[0] != 3 ||
+        DIM[1] != rowsA ||
+        DIM[2] != colsB ||
+        DIM[3] != pages)
+    {
+        throw std::invalid_argument(
+            "Output matrix has incorrect dimensions for multiplyPages()"
+        );
+    }
+
+    for (int page = 0; page < pages; ++page) {
+        for (int i = 0; i < rowsA; ++i) {
+            for (int j = 0; j < colsB; ++j) {
+
+                type sum = 0;
+
+                for (int k = 0; k < inner; ++k) {
+
+                    // A[i][k][page]
+                    const int indexA =
+                    page * rowsA * inner
+                    + i * inner
+                    + k;
+
+                    // B[k][j]
+                    const int indexB =
+                    k * colsB
+                    + j;
+
+                    sum += lhs.data[indexA] * rhs.data[indexB];
+                }
+
+                // C[i][j][page]
+                const int indexOutput =
+                page * rowsA * colsB
+                + i * colsB
+                + j;
+
+                this->data[indexOutput] = sum;
+            }
+        }
+    }
+}
+template <class type>
+Matrix<type>& Matrix<type>::multiplyPages3D(const Matrix<type>& lhs, const Matrix<type>& rhs) {
+    // will need to add error checking
+
+    int numLhsDims = lhs.DIM[0];
+    int numLhsRows = lhs.DIM[1];
+    int numLhsCols = lhs.DIM[2];
+
+    int numRhsDims = rhs.DIM[0];
+    int numRhsRows = rhs.DIM[1];
+    int numRhsCols = rhs.DIM[2];
+    int numRhsPages = rhs.DIM[3];
+
+    int idx;
+    type sum;
+    int interiorSize = numRhsCols*numRhsRows;
+    for (int j = 0; j < numRhsRows; ++j) {
+        for (int i = 0; i < numRhsRows; ++i) {
+            for (int n = 0; n < numLhsRows; ++n) {
+                idx = j*numRhsCols+i;
+
+                sum = 0;
+                for (int k = 0; k < numRhsPages; ++k) {
+                    sum += lhs.data[n*numLhsCols+k]*rhs.data[idx + interiorSize*k];
+                }
+                this->data[idx + interiorSize*n] = sum;
+            }
+        }
+    }
+
+    return *this;
+}
+
+
 // also vibe coded
 template <class type>
 Matrix<type> Matrix<type>::sumOverDim(int dim) {
@@ -403,6 +558,35 @@ Matrix<type> Matrix<type>::sumOverDim(int dim) {
     }
 
     return output;
+}
+template <class type>
+void Matrix<type>::sumOverDimIntoMat(const Matrix<type>& src, int dimToSumOver) {
+    const int* srcDim = src.getDimensions();
+    if (DIM[0] != srcDim[0] - 1) {
+        throw std::invalid_argument(
+            "Dimensions too small for assignment"
+        );
+    }
+    type sum;
+    int idx;
+    int coords[2];
+
+    if (dimToSumOver == 3 && srcDim[0] == 3) {
+        for (int j = 0; j < DIM[2]; ++j) {
+            for (int i = 0; i < DIM[1]; ++i) {
+                coords[0] = i;
+                coords[1] = j;
+                idx = calcLocation(coords);
+
+                sum = 0;
+                for (int k = 0; k < 9; ++k) {
+                    sum += src.data[idx + k*size];
+                }
+
+                data[idx] = sum;
+            }
+        }
+    }
 }
 
 // Other methods
